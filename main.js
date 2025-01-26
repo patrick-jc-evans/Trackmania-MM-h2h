@@ -17,35 +17,41 @@ async function addSingleMatchToDatabase(singleMD) {
     console.log(`Adding ${singleMD.lid}`)
 
     const matchDataInsertStr = format(
-        `INSERT INTO match_info (lid, date, map, winning_team) VALUES %L;`,
+        `INSERT INTO matches_info (lid, date, map, winning_team) VALUES %L;`,
         [[singleMD.lid, singleMD.date, singleMD.map, singleMD.winningTeam]]
     )
-    await db.query(matchDataInsertStr)
-}
 
+    await db.query(matchDataInsertStr)
+
+    console.log("Added to match_info table")
+
+    for(let player of singleMD.playerInfo){
+
+        const playerPerformanceInsertStr = format(
+            "INSERT INTO player_performances (uuid, lid, points, position, team, win_match) VALUES %L;",
+            [[player.uuid, singleMD.lid, player.points, player.position, player.team, player.win_match]]
+        )
+
+        console.log(playerPerformanceInsertStr)
+
+        await db.query(playerPerformanceInsertStr)
+    }
+
+}
 
 async function addAllMatchesToDatabase(matchHistory) {
 
-    console.log(db.database)
-
-    console.log("dropping table")
-    await db.query("DROP TABLE IF EXISTS match_info")
-    console.log("Table dropped, creating new table")
-    await db.query("CREATE TABLE match_info(lid VARCHAR(40) PRIMARY KEY, date VARCHAR(40), map VARCHAR(2), winning_team VARCHAR(4))")
-    console.log("created table")
-
     for(let match of matchHistory){
-        console.log(match)
         await addSingleMatchToDatabase(match)
     }
 
-    return undefined
+    // console.log((await db.query("SELECT * FROM matches_info")).rows)
+    // console.log((await db.query("SELECT * FROM player_performances")).rows)
 }
 
 async function main() {
-    // const matchHistory = await getMatchHistory("SunlessSoph")
-    // await addAllMatchesToDatabase(matchHistory)
-    console.log((await db.query("SELECT * FROM match_info")).rows)
+    const matchHistory = await getMatchHistory("SunlessSoph")
+    await addAllMatchesToDatabase(matchHistory)
+    // console.log((await db.query("SELECT * FROM matches_info")).rows)
 }
-
 main()

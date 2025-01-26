@@ -34,47 +34,42 @@ async function getSingleMatchStats(lid, date) {
 
         //Winning Team
         const winningTeamID = checkWinningTeam(unfiltedMatchData)
-        console.log(winningTeamID, "<----------")
+
+        // TODO: Convert to ternary
         let winningTeam
         if (winningTeamID === 0) winningTeam = "blue"
         else winningTeam = "red"
 
-        //Date
-
-        //Position out of players
-
         const playerInfo = []
 
         for (let i of unfiltedMatchData.players) {
-            const playerName = i.player.name
-            const playerScore = i.score
-            const playerPos = i.rank
-            let playerteam
+            const uuid = i.player.name
+            const points = i.score
+            const position = i.rank
+            let team
             if (i.team === 0) {
-                playerteam = "blue"
+                team = "blue"
             } else {
-                playerteam = "red"
+                team = "red"
             }
             let win_match
-            if (playerteam === winningTeam) {
+            if (team === winningTeam) {
                 win_match = true
             } else {
                 win_match = false
             }
 
             playerInfo.push({
-                playerName,
-                playerScore,
-                playerPos,
-                playerteam,
+                uuid,
+                points,
+                position,
+                team,
                 win_match,
             })
         }
 
-        //Map
         const map = unfiltedMatchData.maps[0].name.slice(-2)
 
-        //Date
         return { lid, date, map, winningTeam, playerInfo }
     }
     catch{
@@ -87,8 +82,6 @@ async function getMatchHistory(playername){
     const player = await getPlayer(playername)
     console.log("MM history for ", player.name)
     const lids = await getPlayerRankedHistory(player)
-
-    console.log(lids)
 
     const filteredMatchesData = []
     for(let lid of lids) {
