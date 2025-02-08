@@ -15,7 +15,7 @@ CREATE TABLE matches_info(lid VARCHAR(40) PRIMARY KEY, date VARCHAR(40), map VAR
 CREATE TABLE player_names(uuid VARCHAR(40) PRIMARY KEY, display_names VARCHAR(40));
 
 -- Stats for each players performance per match
-CREATE TABLE player_performances (id SERIAL PRIMARY KEY, uuid VARCHAR(40), lid VARCHAR(40), points INT, position INT, team VARCHAR(4), win_match BOOLEAN);
+CREATE TABLE player_performances (id SERIAL PRIMARY KEY, uuid VARCHAR(40), date VARCHAR(40), lid VARCHAR(40), points INT, position INT, team VARCHAR(4), win_match BOOLEAN);
 
 SELECT * FROM matches_info;
 

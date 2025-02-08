@@ -3,7 +3,8 @@ const axios = require("axios")
 const client = new TMIO.Client()
 const { Client, Pool } = require("pg")
 const format = require("pg-format")
-const { getMatchHistory } = require("./apiCalls.js")
+const { getMatchHistory, getPlayer } = require("./apiCalls.js")
+const { getAveragePosition, getWinRate } = require("./dbCalls.js")
 
 client.setUserAgent("@Padster01 doing some testing.")
 
@@ -35,15 +36,14 @@ async function addSingleMatchToDatabase(singleMD) {
 
         await db.query(matchDataInsertStr)
 
-        console.log("Added to match_info table")
-
         for (let player of singleMD.playerInfo) {
             const playerPerformanceInsertStr = format(
-                "INSERT INTO player_performances (uuid, lid, points, position, team, win_match) VALUES %L;",
+                "INSERT INTO player_performances (uuid, lid, date, points, position, team, win_match) VALUES %L;",
                 [
                     [
                         player.uuid,
                         singleMD.lid,
+                        singleMD.date,
                         player.points,
                         player.position,
                         player.team,
@@ -51,9 +51,6 @@ async function addSingleMatchToDatabase(singleMD) {
                     ],
                 ]
             )
-
-            console.log(playerPerformanceInsertStr)
-
             await db.query(playerPerformanceInsertStr)
         }
     } else {
@@ -70,9 +67,14 @@ async function addAllMatchesToDatabase(matchHistory) {
     // console.log((await db.query("SELECT * FROM player_performances")).rows)
 }
 
-async function main() {
-    const matchHistory = await getMatchHistory("Padster_01")
+async function main(name) {
+
+    const player = await getPlayer(name)
+    const matchHistory = await getMatchHistory(player)
     await addAllMatchesToDatabase(matchHistory)
-    // console.log((await db.query("SELECT * FROM matches_info")).rows)
+    console.log(await getAveragePosition(player.id))
+    console.log(await getWinRate(player.id))
+
+
 }
-main()
+main("Massa.4PF")

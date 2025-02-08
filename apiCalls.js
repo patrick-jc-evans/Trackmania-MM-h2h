@@ -43,7 +43,8 @@ async function getSingleMatchStats(lid, date) {
         const playerInfo = []
 
         for (let i of unfiltedMatchData.players) {
-            const uuid = i.player.name
+
+            const uuid = i.player.id
             const points = i.score
             const position = i.rank
             let team
@@ -77,9 +78,8 @@ async function getSingleMatchStats(lid, date) {
     }
 }
 
-async function getMatchHistory(playername){
+async function getMatchHistory(player){
 
-    const player = await getPlayer(playername)
     console.log("MM history for ", player.name)
     const lids = await getPlayerRankedHistory(player)
 
@@ -93,4 +93,4 @@ async function getMatchHistory(playername){
     return filteredMatchesData
 }
 
-module.exports = {getMatchHistory}
+module.exports = {getMatchHistory, getPlayer}
