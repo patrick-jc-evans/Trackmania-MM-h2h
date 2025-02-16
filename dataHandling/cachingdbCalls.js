@@ -54,6 +54,4 @@ async function getPositionCountArray(uuid) {
     return positions
 }
 
-// getPositionCountArray("8745604d-f55f-4b6d-bc1c-bbb733557122")
-
 module.exports = { getWinRate, getAveragePosition, getPositionCountArray }

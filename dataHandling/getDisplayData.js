@@ -3,12 +3,12 @@ const axios = require("axios")
 const client = new TMIO.Client()
 const { Client, Pool } = require("pg")
 const format = require("pg-format")
-const { getMatchHistory, getPlayer } = require("./apiCalls.js")
+const { getMatchHistory, getPlayer } = require("./TMIOapiCalls.js")
 const {
     getAveragePosition,
     getWinRate,
     getPositionCountArray,
-} = require("./dbCalls.js")
+} = require("./cachingdbCalls.js")
 
 client.setUserAgent("@Padster01 doing some testing.")
 
@@ -75,9 +75,16 @@ async function main(name) {
     const player = await getPlayer(name)
     const matchHistory = await getMatchHistory(player)
     await addAllMatchesToDatabase(matchHistory)
-    console.log(await getAveragePosition(player.id))
-    console.log(await getWinRate(player.id))
-    console.log(await getPositionCountArray(player.id))
+
+    const data = {}
+
+    data.averagePosition = await getAveragePosition(player.id)
+    data.winRate = await getWinRate(player.id)
+    data.positionCounts = await getPositionCountArray(player.id)
+
+    console.log(data)
+
+    return data
 }
 
 main("Nothing3r")
