@@ -4,7 +4,11 @@ const client = new TMIO.Client()
 const { Client, Pool } = require("pg")
 const format = require("pg-format")
 const { getMatchHistory, getPlayer } = require("./apiCalls.js")
-const { getAveragePosition, getWinRate } = require("./dbCalls.js")
+const {
+    getAveragePosition,
+    getWinRate,
+    getPositionCountArray,
+} = require("./dbCalls.js")
 
 client.setUserAgent("@Padster01 doing some testing.")
 
@@ -68,13 +72,12 @@ async function addAllMatchesToDatabase(matchHistory) {
 }
 
 async function main(name) {
-
     const player = await getPlayer(name)
     const matchHistory = await getMatchHistory(player)
     await addAllMatchesToDatabase(matchHistory)
     console.log(await getAveragePosition(player.id))
     console.log(await getWinRate(player.id))
-
-
+    console.log(await getPositionCountArray(player.id))
 }
-main("Massa.4PF")
+
+main("Nothing3r")

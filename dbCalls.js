@@ -6,9 +6,7 @@ const db = new Client({
 })
 db.connect()
 
-async function getAveragePosition(uuid){
-
-
+async function getAveragePosition(uuid) {
     // Get the average position for the players last 25 matches.
     // limit 25 sort_by date
 
@@ -17,30 +15,45 @@ async function getAveragePosition(uuid){
 
     const averageValues = (await db.query(requestStr)).rows
 
-    const averageValue = averageValues.reduce((acca, val) => {return acca+val.position}, 0)/averageValues.length
+    const averageValue =
+        averageValues.reduce((acca, val) => {
+            return acca + val.position
+        }, 0) / averageValues.length
 
-    return Math.round(100*averageValue)/100
-
+    return Math.round(100 * averageValue) / 100
 }
 
-async function getWinRate(uuid){
-
+async function getWinRate(uuid) {
     // Count the number of wins/losses in the last 25 matches.
     // Divide through for the winrate
-    const matchesWon = await db.query(`SELECT * FROM player_performances WHERE uuid='${uuid}' AND win_match=true ORDER BY date asc LIMIT 25`)
-    const matchesTotal = await db.query(`SELECT * FROM player_performances WHERE uuid='${uuid}' ORDER BY date asc LIMIT 25`)
+    const matchesWon = await db.query(
+        `SELECT * FROM player_performances WHERE uuid='${uuid}' AND win_match=true ORDER BY date asc LIMIT 25`
+    )
+    const matchesTotal = await db.query(
+        `SELECT * FROM player_performances WHERE uuid='${uuid}' ORDER BY date asc LIMIT 25`
+    )
 
-    const winRate = (matchesWon.rowCount/matchesTotal.rowCount)
+    const winRate = matchesWon.rowCount / matchesTotal.rowCount
 
-    return Math.round(100*winRate)
-
+    return Math.round(100 * winRate)
 }
 
-async function getPositionCountArray(uuid){
-
+async function getPositionCountArray(uuid) {
     // Count the number of each cases for each position.
     // This will be messy pure SQL.
+    const requestStr = `SELECT position, COUNT(*) FROM player_performances WHERE uuid='${uuid}' GROUP BY position ORDER BY position`
 
+    const positionCounts = (await db.query(requestStr)).rows
+
+    let positions = [0, 0, 0, 0, 0, 0]
+
+    positionCounts.forEach((obj) => {
+        positions[obj.position - 1] = Number(obj.count)
+    })
+
+    return positions
 }
 
-module.exports = {getWinRate, getAveragePosition}
+// getPositionCountArray("8745604d-f55f-4b6d-bc1c-bbb733557122")
+
+module.exports = { getWinRate, getAveragePosition, getPositionCountArray }
