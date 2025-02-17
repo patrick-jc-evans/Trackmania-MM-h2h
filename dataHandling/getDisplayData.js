@@ -71,7 +71,7 @@ async function addAllMatchesToDatabase(matchHistory) {
     // console.log((await db.query("SELECT * FROM player_performances")).rows)
 }
 
-async function main(name) {
+async function getDisplayData(name) {
     const player = await getPlayer(name)
     const matchHistory = await getMatchHistory(player)
     await addAllMatchesToDatabase(matchHistory)
@@ -87,4 +87,4 @@ async function main(name) {
     return data
 }
 
-main("Nothing3r")
+module.exports = getDisplayData
